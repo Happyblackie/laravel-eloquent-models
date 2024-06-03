@@ -1,0 +1,191 @@
+
+//LESSON 8  => BASIC ROUTING AND PHP RESPONSES:
+.................................................................................................................................
+
+//Route that returns -> view
+Route::get('/', function () {
+    return view('welcome');
+});
+
+//Route that returns -> string
+Route::get('/users', function(){
+    return 'Welcome to the users page';
+});
+
+//Route that returns -> Array(json)
+Route::get('/users', function(){
+    return ['HTML', 'PHP', 'Laravel'];
+});
+
+//Route that returns -> json objects
+Route::get('/users', function(){
+    return response()->json([
+        'name' => 'happy',
+        'career' => 'web developer'
+    ]);
+});
+
+//Route redirect functions
+Route::get('/users', function(){
+    return redirect('/');
+});
+
+
+
+
+
+//LESSON 9  => CONTROLLER IN LARAVEL:
+...........................................................................................................................
+WEB.PHP
+//Laravel new way
+Route::get('/products', [ProductsController::class, 'index']);
+Route::get('/products/about', [ProductsController::class, 'about']);
+
+//Laravel another new way
+Route::get('/products', 'App\Http\Controllers\ProductsController@index');
+
+//Before laravel 8
+Route::get('/products', 'ProductsController@index');
+
+
+PRODUCT CONTROLLER
+public function index()
+    {
+        $title = 'Calming the Storm';
+        $description = 'By Happy B.';
+        $data = [
+            'productOne' => 'iPhone',
+            'productTwo' => 'Samsung'
+        ];
+
+        // compact method
+        // return view('products.index', compact('title', 'description'));
+
+        // with method
+        // return view('products.index')->with('title', $title);
+        //return view('products.index')->with('data', $data);
+
+        //Direct way
+        return view('/products.index', [
+            'data' => $data
+        ]);
+    }
+
+    public function about()
+    {
+        return 'About Page';
+    }
+
+
+//LESSON 10 => ROUTE PARAMETERS:
+...............................................................................................................................
+WEB.PHP
+Route::get('/products/{id}', [ProductsController::class, 'show']);
+
+
+PRODUCT CONTROLLER
+ // public function show($id)
+    // {
+    //     return $id;
+    // }
+    public function show($name)
+    {
+        $data = [
+            'iphone' => 'iPhone',
+            'samsung' => 'Samsung'
+        ];
+
+        return view('products.index', [
+            'products' => $data[$name] ?? 'Product ' . $name . ' does not exist '
+        ]);
+    }
+
+
+//LESSON 10 AND 11
+.............................................................................................
+WEB.PHP
+//Pattern is an Integer
+Route::get('/products/{id}',
+ [ProductsController::class, 'show'])->where('id', '[0-9]+');
+
+//Pattern is an String
+Route::get('/products/{name}',
+ [ProductsController::class, 'show'])->where('name', '[a-zA-Z]+');
+
+ //multiple params
+ Route::get('/products/{name}/{id}',
+ [ProductsController::class, 'show'])->where(
+    [
+        'name' => '[a-z]+',
+        'id'   =>  '[0-9]+'
+    ]
+ );
+
+
+Products/Index FILE
+ <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Products</h1>
+    
+    {{ $products }} <br>
+    <a href="{{ route('products') }}">Product</a>
+
+</body>
+</html>
+
+
+
+
+#LESSON 16
+...................................................................
+about.html
+
+@if (5 > 15)
+    <p>5 is less than 15</p>
+@elseif(5 == 15)
+    <p>5 is indeed greater than 15</p>
+@else
+    <h3>All conditions are wrong</h3>
+@endif
+
+{{-- negates the statements/if not empty --}}
+@unless (empty($name))
+    <p>Name is not empty!</p>
+@endunless
+
+{{-- check if empty --}}
+@empty($name)
+    <p>Name is  empty!</p>
+@endempty
+
+{{-- check if variable is set --}}
+@isset($name)
+    <p>Name is not empty!</p>
+@endisset
+
+
+@switch($name)
+    @case('Happy')
+        <p>Name is Happy</p>
+        @break
+    @case('HappyMonic')
+        <p>Name is an organizaton</p>
+        @break
+    @default
+        <p>No match</p>
+@endswitch
+
+PagesController.php
+  public function about()
+    {
+        $name = 'HappyMonic';
+        return view('about', ['name'=>$name]);
+    }
+....................................................................
+
+
